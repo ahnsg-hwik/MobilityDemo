@@ -29,42 +29,9 @@ public struct MainView: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                NaverMap($store.mapData.sending(\.onChangeMapViewData),
-                         selectedMarkerData: store.selectedMarkerData,
-                         markerData: store.markerData,
-                         markerContent: { item, position, selected in
-                            return NaverMapMarker(position: position)
-                                .image {
-                                    if item is LocationModel {
-                                        switch store.mapData.keyword {
-                                        case .kickboard:
-                                            return MobilityDemoImage.marker(.kickboardClustering).image
-                                        case .bike:
-                                            return MobilityDemoImage.marker(.bikeClustering).image
-                                        default:
-                                            break
-                                        }
-                                    }
-
-                                    return selected ? item.selectedImage : item.image
-                                }
-                                .zIndex(selected ? 100 : 0)
-                                .onTap {
-                                    let isNotSelectable = selected || item is LocationModel
-                                    if !isNotSelectable {
-                                        store.send(.onChangeSelectedMarkerData(item))
-                                        store.send(.onMarkerTapped(true))
-                                    }
-                                }
-                        }
-                )
+                NaverMap(store: store.scope(state: \.naverMap, action: \.naverMap))
                 .onMapTap {
-                    store.send(.onChangeSelectedMarkerData(nil))
-                    store.send(.onMarkerTapped(false))
-                }
-                .onMapViewCameraIdle { zoomLevel in
-                    store.send(.onChangeZoomLevel(zoomLevel))
-                    store.send(.fetchFMSAPi)
+                    initSelectedMarker()
                 }
                 .ignoresSafeArea()
                 
@@ -233,8 +200,7 @@ public struct MainView: View {
                     .shadowRadius2()
                     .fixedSize(horizontal: true, vertical: false)
                     .onTapGesture {
-                        store.send(.onChangeSelectedMarkerData(nil))
-                        store.send(.onMarkerTapped(false))
+                        initSelectedMarker()
                         store.send(.onChangeBubbleKeywordKind(keyword))
                     }
                 }
@@ -268,7 +234,7 @@ public struct MainView: View {
             .clipShape(Capsule())
             .shadowRadius2()
             .onTapGesture {
-                store.send(.showSheet)
+                store.send(.sheetPresented)
             }
             
             Spacer()
@@ -288,6 +254,13 @@ public struct MainView: View {
             .background(Color.white)
             .clipShape(Circle())
             .shadowRadius2()
+    }
+}
+
+extension MainView {
+    func initSelectedMarker() {
+        store.send(.naverMap(.onChangeSelectedMarkerData(nil)))
+        store.send(.naverMap(.onMarkerTapped(false)))
     }
 }
 

@@ -6,29 +6,21 @@
 //
 
 import SwiftUI
+
+import ComposableArchitecture
 import NMapsMap
 
 import Domain
 import Util
+import DSKit
 
 public struct NaverMap: UIViewRepresentable {
-    @Binding private var data: MapData
+    var store: StoreOf<NaverMapFeature>
     
     private var onMapTap: (() -> Void)?
-    private var onMapViewCameraIdle: ((Double) -> Void)?
     
-    private var selectedMarkerData: (any Markable)?
-    private var markerData: MarkerData
-    private var markerContent: ((any Markable, CLLocationCoordinate2D, Bool) -> NaverMapMarker)?
-    
-    public init(_ data: Binding<MapData>,
-                selectedMarkerData: (any Markable)?,
-                markerData: MarkerData,
-                markerContent: @escaping (any Markable, CLLocationCoordinate2D, Bool) -> NaverMapMarker) {
-        self._data = data
-        self.selectedMarkerData = selectedMarkerData
-        self.markerData = markerData
-        self.markerContent = markerContent
+    public init(store: StoreOf<NaverMapFeature>) {
+        self.store = store
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -38,7 +30,10 @@ public struct NaverMap: UIViewRepresentable {
     public func makeUIView(context: Context) -> NMFNaverMapView {
         print("NaverMapView:makeUIView(_:context)")
         
+        store.send(.onAppear)
+        
         let view = NMFNaverMapView(frame: .infinite)
+        
         view.showLocationButton = false
         view.showZoomControls = false
         view.showCompass = false
@@ -102,21 +97,22 @@ public struct NaverMap: UIViewRepresentable {
         // MARK: NMFMapViewCameraDelegate
 
         public func mapViewCameraIdle(_ mapView: NMFMapView) {
-            self.parent.onMapViewCameraIdle?(mapView.zoomLevel)
+            self.parent.store.send(.onChangeZoomLevel(mapView.zoomLevel))
+            if self.parent.store.keyword.isMobility {
+                self.parent.store.send(.fetchFMSAPi)
+            }
             
-            initMapData()
-        }
-        
-        private func initMapData() {
-            self.parent.data.position = ""
-            self.parent.data.serviceAreaGroup = nil
+            // updateUIView 호출 시 연속 호출 동작 제한
+            self.parent.store.send(.onChangePosition(""))
+            self.parent.store.send(.serviceAreaGroupResponse(nil))
         }
     }
 }
 
 extension NaverMap.Coordinator {
     func openInfoWindow(_ mapView: NMFMapView, didTapMap latlng: NMGLatLng) {
-        print("mapTouch: openInfoWindow : touchArea: \(touchArea)")
+        print("NaverMap.Coordinator:openInfoWindow(_:didTapMap)")
+        print("touchArea: \(touchArea)")
         
         infoWindow.close()
 
@@ -139,8 +135,7 @@ extension NaverMap.Coordinator {
 
 extension NaverMap {
     private func updateCamera(_ mapView: NMFMapView, coordinator: Coordinator) {
-        
-        guard let locationCooridnate2D = self.data.position.toCLLocationCoordinate2D else { return }
+        guard let locationCooridnate2D = self.store.position.toCLLocationCoordinate2D else { return }
         
         let location = NMGLatLng(lat: locationCooridnate2D.latitude, lng: locationCooridnate2D.longitude)
         let cameraUpdate = NMFCameraUpdate(position: NMFCameraPosition(location, zoom: mapView.zoomLevel))
@@ -151,17 +146,15 @@ extension NaverMap {
     }
     
     private func updateSelectedMarker(_ mapView: NMFMapView, coordinator: Coordinator) {
-        guard let markerContent = self.markerContent else { return }
-        
-        guard let item = self.selectedMarkerData else {
+        guard let item = store.selectedMarkerData else {
             removeSelectedMarker(coordinator: coordinator)
             return
         }
         
         let ids: [AnyHashable] = Array(coordinator.selectedMarkers.keys)
         let position = CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude)
-        let content = markerContent(item, position, true)
-
+        let content = makeMarker(item: item, position: position, selected: true)
+        
         if !ids.contains(item.identifiable) {
             removeSelectedMarker(coordinator: coordinator)
             
@@ -181,9 +174,7 @@ extension NaverMap {
     }
 
     private func updateMarker(_ mapView: NMFMapView, coordinator: Coordinator) {
-        guard let markerContent = self.markerContent else { return }
-        
-        let allItems = self.markerData.filteredItems(for: data.keyword, level: data.level)
+        let allItems = store.markerData.filteredItems(for: store.keyword, level: store.level)
 
         removeMarker(coordinator: coordinator)
         
@@ -216,8 +207,7 @@ extension NaverMap {
             // - kickboard, bike: mobility 마커 무조건 생성 spot 마커는 상태가 변경될 때만 생성
             // - poi: keyword 변경될 때만 생성
             let position = CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude)
-            let content = markerContent(item, position, false)
-            
+            let content = makeMarker(item: item, position: position, selected: false)
             if !idsSet.contains(itemId) {
                 let marker = content.makeMarker(mapView)
                 coordinator.markers[item.identifiable] = marker
@@ -225,11 +215,37 @@ extension NaverMap {
         }
     }
     
+    private func makeMarker(item: any Markable, position: CLLocationCoordinate2D, selected: Bool) -> NaverMapMarker {
+        return NaverMapMarker(position: position)
+            .image {
+                if item is LocationModel {
+                    switch store.keyword {
+                    case .kickboard:
+                        return MobilityDemoImage.marker(.kickboardClustering).image
+                    case .bike:
+                        return MobilityDemoImage.marker(.bikeClustering).image
+                    default:
+                        break
+                    }
+                }
+                
+                return selected ? item.selectedImage : item.image
+            }
+            .zIndex(selected ? 100 : 0)
+            .onTap {
+                let isNotSelectable = selected || item is LocationModel
+                if !isNotSelectable {
+                    store.send(.onChangeSelectedMarkerData(item))
+                    store.send(.onMarkerTapped(true))
+                }
+            }
+    }
+    
     /// 마커 삭제
     /// - Parameter coordinator: coordinator
     private func removeMarker(coordinator: Coordinator) {
         let commonTypes = [String(describing: Mobility.self), String(describing: LocationModel.self)]
-        let targetType = (data.keyword == .kickboard || data.keyword == .bike)
+        let targetType = (store.keyword == .kickboard || store.keyword == .bike)
             ? String(describing: PoiItem.self)
             : String(describing: Spot.self)
         let searchKeywords = commonTypes + [targetType]
@@ -245,10 +261,10 @@ extension NaverMap {
             }
     }
     
-    
     private func updatePolygon(_ mapView: NMFMapView, coordinator: Coordinator) {
+        print("NaverMapView:updatePolygon(_:coordinator)")
         
-        guard let serviceAvailable = self.data.serviceAreaGroup?.serviceAvailable else { return }
+        guard let serviceAvailable = store.serviceAreaGroup?.serviceAvailable else { return }
         
         coordinator.polygonOverlay?.mapView = nil
         coordinator.polygonOverlay = nil
@@ -269,9 +285,10 @@ extension NaverMap {
     }
     
     private func updateExceptionPolygon(_ mapView: NMFMapView, coordinator: Coordinator) {
+        print("NaverMapView:updateExceptionPolygon(_:coordinator)")
         
-        guard let serviceDisable = self.data.serviceAreaGroup?.serviceDisable,
-              let returnDisable = self.data.serviceAreaGroup?.returnDisable else { return }
+        guard let serviceDisable = store.serviceAreaGroup?.serviceDisable,
+              let returnDisable = store.serviceAreaGroup?.returnDisable else { return }
         
         coordinator.polygonOverlays?.forEach { $0.mapView = nil }
         coordinator.polygonOverlays = nil
@@ -300,9 +317,9 @@ extension NaverMap {
         return new
     }
     
-    public func onMapViewCameraIdle(action: @escaping (Double) -> Void) -> Self {
-        var new = self
-        new.onMapViewCameraIdle = action
-        return new
-    }
+//    public func onMapViewCameraIdle(action: @escaping (Double) -> Void) -> Self {
+//        var new = self
+//        new.onMapViewCameraIdle = action
+//        return new
+//    }
 }
