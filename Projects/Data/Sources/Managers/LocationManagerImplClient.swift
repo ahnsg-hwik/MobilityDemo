@@ -19,15 +19,10 @@ extension LocationManagerClient {
         let location = Location()
 
         return Self(
-            isAuthorization: {
-                location.isAuthorization
-            }, checkAuthorization: {
-                location.checkAuthorization()
-            }, fetchLocation: {
-                location.locationCoordinate
-            }, delegate: {
-                location.authorizationStream
-            }
+            isAuthorization: { location.isAuthorization  },
+            checkAuthorization: { location.checkAuthorization() },
+            fetchLocation: { location.locationCoordinate },
+            delegate: { location.authorizationStream }
         )
     }
 }
