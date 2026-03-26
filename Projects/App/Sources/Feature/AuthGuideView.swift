@@ -19,7 +19,7 @@ public struct AuthGuideItem {
 }
 
 public struct AuthGuideView: View {
-    @Perception.Bindable var store: StoreOf<AuthGuideFeature>
+    @Bindable var store: StoreOf<AuthGuideFeature>
     
     private var item: [AuthGuideItem] = [
         AuthGuideItem(required: true, imageName: "location", title: "위치 (필수)", content: "현위치 기반 주변겸색 등을 위한 접근 설정"),
@@ -32,83 +32,81 @@ public struct AuthGuideView: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            VStack {
-                
-                Spacer()
-                
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        HighlightText("편리한 이용을 위해\n접근권한의 허용이 필요 합니다.")
-                            .base(font: .boldSystemFont(ofSize: 24))
-                            .highlightText("접근권한의 허용")
-                            .highlight(color: UIColor(Color(.representation(.mdColor))))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 34)
-                        
-                        Text("필수 접근 권한")
-                            .font(.title3)
-                            .padding(.vertical)
-                        
-                        VStack {
-                            ForEach(item, id: \.title) { item in
-                                HStack(alignment: .top, spacing: 9) {
-                                    Image(systemName: item.imageName)
-                                        .foregroundColor(Color(.representation(.mdColor)))
+        VStack {
+            
+            Spacer()
+            
+            ScrollView {
+                VStack(alignment: .leading) {
+                    HighlightText("편리한 이용을 위해\n접근권한의 허용이 필요 합니다.")
+                        .base(font: .boldSystemFont(ofSize: 24))
+                        .highlightText("접근권한의 허용")
+                        .highlight(color: UIColor(Color(.representation(.mdColor))))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 34)
+                    
+                    Text("필수 접근 권한")
+                        .font(.title3)
+                        .padding(.vertical)
+                    
+                    VStack {
+                        ForEach(item, id: \.title) { item in
+                            HStack(alignment: .top, spacing: 9) {
+                                Image(systemName: item.imageName)
+                                    .foregroundColor(Color(.representation(.mdColor)))
+                                
+                                VStack(spacing: 4) {
+                                    HighlightText(item.title)
+                                        .base(font: .boldSystemFont(ofSize: 18))
+                                        .highlightText("(필수)")
+                                        .highlight(font: .systemFont(ofSize: 18), color: UIColor(Color(.representation(.mdSubColor))))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                     
-                                    VStack(spacing: 4) {
-                                        HighlightText(item.title)
-                                            .base(font: .boldSystemFont(ofSize: 18))
-                                            .highlightText("(필수)")
-                                            .highlight(font: .systemFont(ofSize: 18), color: UIColor(Color(.representation(.mdSubColor))))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        
-                                        Text(item.content)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.gray)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
+                                    Text(item.content)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.gray)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                                .padding(.bottom, 16)
                             }
+                            .padding(.bottom, 16)
                         }
-                        .padding(.horizontal, 14)
                     }
-                }
-                
-                Button(action: {
-                    store.send(.openSettingsButtonTapped(true))
-                }) {
-                    Text("설정 하기")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(.representation(.mdSubColor)))
-                        .cornerRadius(8)
+                    .padding(.horizontal, 14)
                 }
             }
-            .popup(isPresented: $store.isSettingPresented.sending(\.openSettingsButtonTapped)) {
-                AuthGuideAlert {
-                    store.send(.openSettingsButtonTapped(false))
-                    store.send(.openSettings)
-                }
-            } customize: {
-                $0
-                    .type(.floater())
-                    .appearFrom(.none)
-                    .disappearTo(.none)
-                    .position(.center)
-                    .closeOnTap(false)
-                    .allowTapThroughBG(false)
-                    .backgroundColor(.black.opacity(0.4))
+            
+            Button(action: {
+                store.send(.openSettingsButtonTapped(true))
+            }) {
+                Text("설정 하기")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.representation(.mdSubColor)))
+                    .cornerRadius(8)
             }
-            .padding(.horizontal, 24)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.white)
-            .onAppear() {
-                store.send(.onAppear)
+        }
+        .popup(isPresented: $store.isSettingPresented) {
+            AuthGuideAlert {
+                store.send(.openSettingsButtonTapped(false))
+                store.send(.openSettings)
             }
+        } customize: {
+            $0
+                .type(.floater())
+                .appearFrom(.none)
+                .disappearTo(.none)
+                .position(.center)
+                .closeOnTap(false)
+                .allowTapThroughBG(false)
+                .backgroundColor(.black.opacity(0.4))
+        }
+        .padding(.horizontal, 24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
+        .onAppear() {
+            store.send(.onAppear)
         }
     }
 }

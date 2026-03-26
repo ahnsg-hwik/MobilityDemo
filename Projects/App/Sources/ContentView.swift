@@ -35,19 +35,19 @@ public struct ContentFeature {
 }
 
 public struct ContentView: View {
-    @Perception.Bindable private var store: StoreOf<ContentFeature>
+    @Bindable private var store: StoreOf<ContentFeature>
     
     public init(store: StoreOf<ContentFeature>) {
         self.store = store
     }
 
     public var body: some View {
-        WithPerceptionTracking {
+        VStack {
             Text("Hello, World!")
                 .padding()
             
             GroupBox {
-                TextField("텍스트 입력", text: $store.text.sending(\.onChangeText))
+                TextField("텍스트 입력", text: $store.text)
                     .textFieldStyle(.roundedBorder)
                 
                 Text("텍스트 결과 : \(store.text)")

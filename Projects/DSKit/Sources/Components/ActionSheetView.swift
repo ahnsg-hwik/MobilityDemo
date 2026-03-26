@@ -32,7 +32,7 @@ public struct ActionSheetView<Content: View>: View {
                     .clipShape(Capsule())
                     .padding(.top, 15)
                     .padding(.bottom, 10)
-
+                
                 content
                     .padding(.bottom, 30)
                     .applyIf(fixedHeight) {

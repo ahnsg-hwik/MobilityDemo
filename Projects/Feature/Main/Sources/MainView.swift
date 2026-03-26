@@ -14,7 +14,7 @@ import Domain
 import DSKit
 
 public struct MainView: View {
-    @Perception.Bindable var store: StoreOf<MainFeature>
+    @Bindable var store: StoreOf<MainFeature>
     
     @State private var isHidden = false
     private let visibleWidth: CGFloat = 20
@@ -27,89 +27,87 @@ public struct MainView: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                NaverMap(store: store.scope(state: \.naverMap, action: \.naverMap))
+        ZStack {
+            NaverMap(store: store.scope(state: \.naverMap, action: \.naverMap))
                 .onMapTap {
                     initSelectedMarker()
                 }
                 .ignoresSafeArea()
+            
+            VStack {
+                SearchArea
+                    .padding(.top, 12)
+                    .padding(.horizontal, 24)
                 
-                VStack {
-                    SearchArea
-                        .padding(.top, 12)
-                        .padding(.horizontal, 24)
-                    
-                    BubbleKeywordArea
-                        .padding(.vertical, 4)
+                BubbleKeywordArea
+                    .padding(.vertical, 4)
 
-                    Spacer()
-                    
-                    ControllerArea
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 18)
-                }
+                Spacer()
                 
-                floatingArea
+                ControllerArea
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 18)
             }
-            .onAppear() {
-                store.send(.onAppear)
-            }
-            .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) {
-                PhotoView(store: $0)
-            }
-            .popup(isPresented: $store.isMarkerPresented.sending(\.onMarkerTapped)) {
-                if let data = store.selectedMarkerData as? Mobility {
-                    MobilityBottomSheet(data: data) {
-                        store.send(.onMarkerTapped(false))
-                    }
+            
+            floatingArea
+        }
+        .onAppear() {
+            store.send(.onAppear)
+        }
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) {
+            PhotoView(store: $0)
+        }
+        .popup(isPresented: $store.isMarkerPresented) {
+            if let data = store.selectedMarkerData as? Mobility {
+                MobilityBottomSheet(data: data) {
+                    store.send(.onMarkerTapped(false))
                 }
-            } customize: {
-                $0
-                    .type(.floater(verticalPadding: 0, useSafeAreaInset: false))
-                    .position(.bottom)
-                    .dragToDismiss(false)
-                    .closeOnTap(false)
             }
-            .popup(isPresented: $store.isPopupPresented.sending(\.onPopupButtonTapped)) {
-                BottomSheetFirst {
-                    store.send(.onPopupButtonTapped(false))
+        } customize: {
+            $0
+                .type(.floater(verticalPadding: 0, useSafeAreaInset: false))
+                .position(.bottom)
+                .dragToDismiss(false)
+                .closeOnTap(false)
+        }
+        .popup(isPresented: $store.isPopupPresented) {
+            BottomSheetFirst {
+                store.send(.onPopupButtonTapped(false))
+            }
+        } customize: {
+            $0
+                .type(.floater(verticalPadding: 0, useSafeAreaInset: false))
+                .position(.bottom)
+                .dragToDismiss(false)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.4))
+                .allowTapThroughBG(false)
+        }
+        .popup(isPresented: $store.isSheetPresented) {
+            ActionSheetFirst()
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.4))
+                .allowTapThroughBG(false)
+        }
+        .contentBackground(isPresented: $store.isMenuPresented) {
+            SideMenu { item in
+                print("item: \(item)")
+                store.send(.onMenuButtonTapped(false))
+                switch item {
+                case .setting:
+                    store.send(.onTapSetting)
+                default:
+                    break
                 }
-            } customize: {
-                $0
-                    .type(.floater(verticalPadding: 0, useSafeAreaInset: false))
-                    .position(.bottom)
-                    .dragToDismiss(false)
-                    .closeOnTap(false)
-                    .backgroundColor(.black.opacity(0.4))
-                    .allowTapThroughBG(false)
             }
-            .popup(isPresented: $store.isSheetPresented.sending(\.onSheetButtonTapped)) {
-                ActionSheetFirst()
-            } customize: {
-                $0
-                    .type(.toast)
-                    .position(.bottom)
-                    .closeOnTap(false)
-                    .backgroundColor(.black.opacity(0.4))
-                    .allowTapThroughBG(false)
-            }
-            .contentBackground(isPresented: $store.isMenuPresented.sending(\.onMenuButtonTapped)) {
-                SideMenu { item in
-                    print("item: \(item)")
-                    store.send(.onMenuButtonTapped(false))
-                    switch item {
-                    case .setting:
-                        store.send(.onTapSetting)
-                    default:
-                        break
-                    }
-                }
-            } customize: {
-                $0
-                    .edgeTransition(.move(edge: .leading))
-                    .backgroundColor(.black.opacity(0.4))
-            }
+        } customize: {
+            $0
+                .edgeTransition(.move(edge: .leading))
+                .backgroundColor(.black.opacity(0.4))
         }
     }
     

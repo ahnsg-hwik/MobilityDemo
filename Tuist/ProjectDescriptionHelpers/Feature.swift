@@ -19,7 +19,7 @@ public enum Feature: String, CaseIterable {
             product: .framework,
 //            product: .staticFramework,
             bundleId: "dev.tuist.MobilityDemo.\(self.rawValue)",
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: .iOS("17.0"),
             infoPlist: .file(path: .relativeToRoot("Projects/App/Resources/MobilityDemo-Info.plist")),
             buildableFolders: [
                 .folder("\(self.rawValue)/Sources"),
@@ -39,7 +39,7 @@ public enum Feature: String, CaseIterable {
             destinations: .iOS,
             product: .app,
             bundleId: "dev.tuist.MobilityDemo.\(self.rawValue)Demo",
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: .iOS("17.0"),
             infoPlist: .file(path: .relativeToRoot("Projects/App/Resources/MobilityDemo-Info.plist")),
             buildableFolders: [
                 .folder("\(self.rawValue)Demo/Sources"),

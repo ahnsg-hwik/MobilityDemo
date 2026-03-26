@@ -17,7 +17,7 @@ let project = Project(
             destinations: .iOS,
             product: .app,
             bundleId: "dev.tuist.MobilityDemo.tag",
-            deploymentTargets: .iOS("16.0"),
+            deploymentTargets: .iOS("17.0"),
             infoPlist: .file(path: .relativeToRoot("Projects/App/Resources/MobilityDemo-Info.plist")),
             buildableFolders: [
                 "Sources",
