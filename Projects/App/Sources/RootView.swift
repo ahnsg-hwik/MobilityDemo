@@ -16,20 +16,18 @@ public struct RootView: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            switch store.state {
-            case .splash:
-                if let store = store.scope(state: \.splash, action: \.splash) {
-                    SplashView(store: store)
-                }
-            case .auth:
-                if let store = store.scope(state: \.auth, action: \.auth) {
-                    AuthGuideView(store: store)
-                }
-            case .intro:
-                if let store = store.scope(state: \.intro, action: \.intro) {
-                    IntroView(store: store)
-                }
+        switch store.state {
+        case .splash:
+            if let store = store.scope(state: \.splash, action: \.splash) {
+                SplashView(store: store)
+            }
+        case .auth:
+            if let store = store.scope(state: \.auth, action: \.auth) {
+                AuthGuideView(store: store)
+            }
+        case .intro:
+            if let store = store.scope(state: \.intro, action: \.intro) {
+                IntroView(store: store)
             }
         }
     }
