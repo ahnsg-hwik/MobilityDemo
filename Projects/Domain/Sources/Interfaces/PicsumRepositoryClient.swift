@@ -12,13 +12,13 @@ public struct PicsumRepositoryClient: Sendable {
     public var fetchPhotoList: @Sendable () async throws -> [PhotoList]
 }
 
+extension PicsumRepositoryClient: DependencyKey {
+    public static var liveValue = Self()
+}
+
 extension DependencyValues {
-    var picsumRepositoryClient: PicsumRepositoryClient {
+    public var picsumRepositoryClient: PicsumRepositoryClient {
         get { self[PicsumRepositoryClient.self] }
         set { self[PicsumRepositoryClient.self] = newValue }
     }
-}
-
-extension PicsumRepositoryClient: TestDependencyKey {
-    public static var testValue = Self()
 }

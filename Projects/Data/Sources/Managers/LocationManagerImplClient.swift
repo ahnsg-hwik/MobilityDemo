@@ -6,16 +6,11 @@
 //
 
 import CoreLocation
-import ComposableArchitecture
 
 import Domain
 
-extension LocationManagerClient: @retroactive DependencyKey {
-    public static let liveValue = LocationManagerClient.live
-}
-
 extension LocationManagerClient {
-    static var live: Self {
+    public static var live: Self {
         let location = Location()
 
         return Self(

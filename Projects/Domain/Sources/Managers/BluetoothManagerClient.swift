@@ -20,12 +20,12 @@ public struct BluetoothManagerClient {
     }
 }
 
-extension BluetoothManagerClient: TestDependencyKey {
-    public static var testValue = Self()
+extension BluetoothManagerClient: DependencyKey {
+    public static var liveValue = Self()
 }
 
-public extension DependencyValues {
-    var bluetoothManagerClient: BluetoothManagerClient {
+extension DependencyValues {
+    public var bluetoothManagerClient: BluetoothManagerClient {
         get { self[BluetoothManagerClient.self] }
         set { self[BluetoothManagerClient.self] = newValue }
     }

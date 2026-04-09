@@ -6,6 +6,10 @@
 //
 
 import SwiftUI
+
+import Domain
+import Data
+
 import Main
 
 @main
@@ -13,10 +17,12 @@ struct MainDemoApp: App {
     var body: some Scene {
         WindowGroup {
             MainView(
-                store: .init(
-                    initialState: .init(),
-                    reducer: { MainFeature() }
-                )
+                store: .init( initialState: .init()) {
+                    MainFeature()
+                } withDependencies: {
+                    $0.setAllManager()
+                    $0.setAllRepository()
+                }
             )
         }
     }
@@ -24,9 +30,11 @@ struct MainDemoApp: App {
 
 #Preview {
     MainView(
-        store: .init(
-            initialState: .init(),
-            reducer: { MainFeature() }
-        )
+        store: .init( initialState: .init()) {
+            MainFeature()
+        } withDependencies: {
+            $0.setAllManager()
+            $0.setAllRepository()
+        }
     )
 }
