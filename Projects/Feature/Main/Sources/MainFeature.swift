@@ -6,10 +6,9 @@
 //
 
 import UIKit
-
 import ComposableArchitecture
+
 import Domain
-import Setting
 
 @Reducer
 public struct MainFeature {
