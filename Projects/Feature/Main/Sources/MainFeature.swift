@@ -91,7 +91,11 @@ public struct MainFeature {
                 return .run { [locationManagerClient] send in
                     let location = try await locationManagerClient.fetchLocation()
                     let position = "\(location?.latitude ?? 37.565493),\(location?.longitude ?? 126.978093)"
+                #if targetEnvironment(simulator)
+                    await send(.naverMap(.onChangePosition("37.565493,126.978093")))
+                #else
                     await send(.naverMap(.onChangePosition(position)))
+                #endif
                 }
                 
                 // MARK: popup
