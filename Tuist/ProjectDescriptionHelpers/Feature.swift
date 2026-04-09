@@ -53,7 +53,6 @@ public enum Feature: String, CaseIterable {
         case .main:
             return [
                 .external(name: "NMapsMap"),
-                .project(target: "Setting", path: .relativeToRoot("Projects/Feature")),
             ]
         case .setting: return []
         }

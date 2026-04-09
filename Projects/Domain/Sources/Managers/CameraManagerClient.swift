@@ -18,12 +18,12 @@ public struct CameraManagerClient {
     }
 }
 
-extension CameraManagerClient: TestDependencyKey {
-    public static var testValue = Self()
+extension CameraManagerClient: DependencyKey {
+    public static var liveValue = Self()
 }
 
-public extension DependencyValues {
-    var cameraManagerClient: CameraManagerClient {
+extension DependencyValues {
+    public var cameraManagerClient: CameraManagerClient {
         get { self[CameraManagerClient.self] }
         set { self[CameraManagerClient.self] = newValue }
     }

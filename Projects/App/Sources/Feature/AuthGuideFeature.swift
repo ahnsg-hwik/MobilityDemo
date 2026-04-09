@@ -46,9 +46,7 @@ public struct AuthGuideFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                return .merge(
-                    .send(.locationAuthorization)
-                )
+                return .send(.locationAuthorization)
             case .locationDelegate:
                 return .run { send in
                     let locationStream = try await locationManagerClient.delegate()

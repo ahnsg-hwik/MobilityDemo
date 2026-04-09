@@ -106,7 +106,11 @@ public struct AuthGuideView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
         .onAppear() {
+        #if targetEnvironment(simulator)
+            store.send(.onTapNext)
+        #else
             store.send(.onAppear)
+        #endif
         }
     }
 }

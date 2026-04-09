@@ -22,12 +22,12 @@ public struct LocationManagerClient {
     }
 }
 
-extension LocationManagerClient: TestDependencyKey {
-    public static var testValue = Self()
+extension LocationManagerClient: DependencyKey {
+    public static var liveValue = Self()
 }
 
-public extension DependencyValues {
-    var locationManagerClient: LocationManagerClient {
+extension DependencyValues {
+    public var locationManagerClient: LocationManagerClient {
         get { self[LocationManagerClient.self] }
         set { self[LocationManagerClient.self] = newValue }
     }

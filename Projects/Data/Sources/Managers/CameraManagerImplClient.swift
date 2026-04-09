@@ -6,16 +6,11 @@
 //
 
 import AVFoundation
-import ComposableArchitecture
 
 import Domain
 
-extension CameraManagerClient: @retroactive DependencyKey {
-    public static let liveValue = CameraManagerClient.live
-}
-
 extension CameraManagerClient {
-    static var live: Self {
+    public static var live: Self {
         let camera = Camera()
 
         return Self(

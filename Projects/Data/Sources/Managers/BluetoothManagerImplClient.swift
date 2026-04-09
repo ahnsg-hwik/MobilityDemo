@@ -6,12 +6,8 @@
 //
 
 import CoreBluetooth
-import ComposableArchitecture
-import Domain
 
-extension BluetoothManagerClient: @retroactive DependencyKey {
-    public static let liveValue = BluetoothManagerClient.live
-}
+import Domain
 
 extension BluetoothManagerClient {
     public static var live: Self {
