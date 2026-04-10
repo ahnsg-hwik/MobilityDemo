@@ -104,8 +104,7 @@ public struct NaverMap: UIViewRepresentable {
             }
             
             // updateUIView 호출 시 연속 호출 동작 제한
-            self.parent.store.send(.onChangePosition(""))
-            self.parent.store.send(.serviceAreaGroupResponse(nil))
+//            self.parent.store.send(.serviceAreaGroupResponse(nil))
         }
     }
 }
@@ -136,14 +135,19 @@ extension NaverMap.Coordinator {
 
 extension NaverMap {
     private func updateCamera(_ mapView: NMFMapView, coordinator: Coordinator) {
-        guard let locationCooridnate2D = self.store.position.toCLLocationCoordinate2D else { return }
+        print("NaverMapView:updateCamera(_:coordinator)")
+        
+        guard let locationCooridnate2D = self.store.position.toCLLocationCoordinate2D,
+              store.isUpdatingCameraPosition else { return }
         
         let location = NMGLatLng(lat: locationCooridnate2D.latitude, lng: locationCooridnate2D.longitude)
         let cameraUpdate = NMFCameraUpdate(position: NMFCameraPosition(location, zoom: mapView.zoomLevel))
         cameraUpdate.animation = .easeIn
         
         mapView.locationOverlay.location = location
-        mapView.moveCamera(cameraUpdate)
+        mapView.moveCamera(cameraUpdate) { _ in
+            store.send(.onCameraMoved)
+        }
     }
     
     private func updateSelectedMarker(_ mapView: NMFMapView, coordinator: Coordinator) {

@@ -12,7 +12,7 @@ import ComposableArchitecture
 public struct LocationManagerClient {
     public var isAuthorization: @Sendable () -> Bool = { false }
     public var checkAuthorization: @Sendable () -> Bool = { false }
-    public var fetchLocation: @Sendable () async throws -> CLLocationCoordinate2D?
+    public var fetchLocation: @Sendable () async throws -> CLLocationCoordinate2D
     public var delegate: @Sendable () async throws -> AsyncStream<DelegateAction>
         
     public enum DelegateAction {

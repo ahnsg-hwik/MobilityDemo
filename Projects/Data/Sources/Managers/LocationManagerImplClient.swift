@@ -24,16 +24,21 @@ extension LocationManagerClient {
 
 private final class Location: NSObject {
     private var locationManager = CLLocationManager()
+    private var region = CLLocationCoordinate2D(latitude: 37.565493, longitude: 126.978093)
     
     var isAuthorization: Bool {
         let status = locationManager.authorizationStatus
         return status == .authorizedAlways || status == .authorizedWhenInUse
     }
     
-    var locationCoordinate: CLLocationCoordinate2D? {
+    var locationCoordinate: CLLocationCoordinate2D {
         locationManager.requestWhenInUseAuthorization() // 권한 팝업 표시
         locationManager.startUpdatingLocation() // 현재 위치를 지속적으로 요청
-        return locationManager.location?.coordinate
+#if targetEnvironment(simulator)
+        return region
+#else
+        return locationManager.location?.coordinate ?? region
+#endif
     }
     
     private var addToAuthorization: ((LocationManagerClient.DelegateAction) -> Void)?

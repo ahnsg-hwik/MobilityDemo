@@ -21,6 +21,8 @@ public struct NaverMapFeature {
         var markerData: MarkerData = .init()
         var selectedMarkerData: (any Markable)?
         
+        var isUpdatingCameraPosition: Bool = false
+        
         public init() {}
     }
     
@@ -30,6 +32,10 @@ public struct NaverMapFeature {
         case onChangeKeyword(BubbleKeywordKind)
         case onChangeZoomLevel(Double)
         case onChangeSelectedMarkerData((any Markable)?)
+        
+        // MARK:
+        case onCurrentLocation
+        case onCameraMoved
 
         // MARK: api
         case fetchServiceArea
@@ -51,6 +57,8 @@ public struct NaverMapFeature {
     
     @Dependency(\.mainClient) var mainClient
     
+    @Dependency(\.locationManagerClient) var locationManagerClient
+    
     @Dependency(\.mapAreaUseCaseClient) var mapAreaUseCaseClient
     @Dependency(\.fmsUseCaseClient) var fmsUseCaseClient
     @Dependency(\.spotUseCaseClient) var spotUseCaseClient
@@ -61,6 +69,7 @@ public struct NaverMapFeature {
             switch action {
             case .onAppear:
                 return .merge(
+                    .send(.onCurrentLocation),
                     .send(.fetchServiceArea),
                     .send(.fetchSpot)
                 )
@@ -81,6 +90,18 @@ public struct NaverMapFeature {
                 return .none
             case let .onChangeSelectedMarkerData(data):
                 state.selectedMarkerData = data
+                return .none
+                
+                // MARK:
+            case .onCurrentLocation:
+                state.isUpdatingCameraPosition = true
+                return .run { send in
+                    let location = try await locationManagerClient.fetchLocation()
+                    let position = "\(location.latitude),\(location.longitude)"
+                    await send(.onChangePosition(position))
+                }
+            case .onCameraMoved:
+                state.isUpdatingCameraPosition = false
                 return .none
                 
                 // MARK: api

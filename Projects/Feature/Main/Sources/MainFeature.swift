@@ -44,7 +44,6 @@ public struct MainFeature {
         
         // MARK: map
         case onChangeBubbleKeywordKind(BubbleKeywordKind)
-        case onCurrentLocation
 
         // MARK: popup
         case onPopupButtonTapped(Bool)
@@ -64,8 +63,6 @@ public struct MainFeature {
     
     public init() {}
     
-    @Dependency(\.locationManagerClient) var locationManagerClient
-    
     public var body: some Reducer<State, Action> {
         // MARK: scope (child feature)
         Scope(state: \.naverMap, action: \.naverMap) { NaverMapFeature() }
@@ -76,24 +73,15 @@ public struct MainFeature {
             switch action {
                 // MARK: view
             case .onAppear:
-                return .send(.onCurrentLocation)
+                return .none
                 
                 // MARK: navigation
             case .onTapSetting:
                 return .none
                 
+                // MARK: map
             case let .onChangeBubbleKeywordKind(keyword):
                 return .send(.naverMap(.onChangeKeyword(keyword)))
-            case .onCurrentLocation:
-                return .run { [locationManagerClient] send in
-                    let location = try await locationManagerClient.fetchLocation()
-                    let position = "\(location?.latitude ?? 37.565493),\(location?.longitude ?? 126.978093)"
-                #if targetEnvironment(simulator)
-                    await send(.naverMap(.onChangePosition("37.565493,126.978093")))
-                #else
-                    await send(.naverMap(.onChangePosition(position)))
-                #endif
-                }
                 
                 // MARK: popup
             case let .onPopupButtonTapped(isPresented):

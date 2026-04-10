@@ -216,7 +216,7 @@ public struct MainView: View {
         HStack {
             CircleButton("location.circle.fill")
                 .onTapGesture {
-                    store.send(.onCurrentLocation)
+                    store.send(.naverMap(.onCurrentLocation))
                 }
             
             Spacer()
