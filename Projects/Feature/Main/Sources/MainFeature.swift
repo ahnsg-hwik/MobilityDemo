@@ -5,7 +5,6 @@
 //  Created by iOS_Hwik on 12/16/25.
 //
 
-import UIKit
 import ComposableArchitecture
 
 import Domain
@@ -16,8 +15,7 @@ public struct MainFeature {
     public struct State {
         // MARK: map
         var keyword: BubbleKeywordKind = .kickboard
-        var selectedMarkerData: (any Markable)?
-        
+
         // MARK: popup
         var isPopupPresented = false
         var isSheetPresented = false
@@ -126,12 +124,6 @@ public struct MainFeature {
                 // MARK: scope (child feature)
             case let .naverMap(action):
                 switch action {
-                case let .onChangeSelectedMarkerData(data):
-                    state.selectedMarkerData = data
-                    return .none
-                case let .onMarkerTapped(isPresented):
-                    state.isMarkerPresented = isPresented
-                    return .none
                 case let .onChangeKeyword(keyword):
                     state.keyword = keyword
                     return .none

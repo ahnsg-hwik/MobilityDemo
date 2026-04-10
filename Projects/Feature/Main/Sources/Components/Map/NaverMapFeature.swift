@@ -30,9 +30,6 @@ public struct NaverMapFeature {
         case onChangeKeyword(BubbleKeywordKind)
         case onChangeZoomLevel(Double)
         case onChangeSelectedMarkerData((any Markable)?)
-        
-        //
-        case onMarkerTapped(Bool)
 
         // MARK: api
         case fetchServiceArea
@@ -84,10 +81,6 @@ public struct NaverMapFeature {
                 return .none
             case let .onChangeSelectedMarkerData(data):
                 state.selectedMarkerData = data
-                return .none
-                
-                //
-            case .onMarkerTapped:
                 return .none
                 
                 // MARK: api

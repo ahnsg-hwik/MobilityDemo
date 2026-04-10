@@ -30,7 +30,10 @@ public struct MainView: View {
         ZStack {
             NaverMap(store: store.scope(state: \.naverMap, action: \.naverMap))
                 .onMapTap {
-                    initSelectedMarker()
+                    dismissMarkerBottomSheet()
+                }
+                .onMarkerTap {
+                    store.send(.onMarkerTapped(true))
                 }
                 .ignoresSafeArea()
             
@@ -58,7 +61,7 @@ public struct MainView: View {
             PhotoView(store: $0)
         }
         .popup(isPresented: $store.isMarkerPresented) {
-            if let data = store.selectedMarkerData as? Mobility {
+            if let data = store.naverMap.selectedMarkerData as? Mobility {
                 MobilityBottomSheet(data: data) {
                     store.send(.onMarkerTapped(false))
                 }
@@ -198,8 +201,8 @@ public struct MainView: View {
                     .shadowRadius2()
                     .fixedSize(horizontal: true, vertical: false)
                     .onTapGesture {
-                        initSelectedMarker()
                         store.send(.onChangeBubbleKeywordKind(keyword))
+                        dismissMarkerBottomSheet()
                     }
                 }
             }
@@ -256,9 +259,9 @@ public struct MainView: View {
 }
 
 extension MainView {
-    func initSelectedMarker() {
+    func dismissMarkerBottomSheet() {
         store.send(.naverMap(.onChangeSelectedMarkerData(nil)))
-        store.send(.naverMap(.onMarkerTapped(false)))
+        store.send(.onMarkerTapped(false))
     }
 }
 

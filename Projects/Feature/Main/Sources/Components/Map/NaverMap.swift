@@ -18,6 +18,7 @@ public struct NaverMap: UIViewRepresentable {
     var store: StoreOf<NaverMapFeature>
     
     private var onMapTap: (() -> Void)?
+    private var onMarkerTap: (() -> Void)?
     
     public init(store: StoreOf<NaverMapFeature>) {
         self.store = store
@@ -236,7 +237,7 @@ extension NaverMap {
                 let isNotSelectable = selected || item is LocationModel
                 if !isNotSelectable {
                     store.send(.onChangeSelectedMarkerData(item))
-                    store.send(.onMarkerTapped(true))
+                    self.onMarkerTap?()
                 }
             }
     }
@@ -309,17 +310,25 @@ extension NaverMap {
 }
 
 extension NaverMap {
-    /// 지도가 탭되면 호출된다.
+    /// 지도가 탭 되면 호출 된다.
+    ///
     /// `NMFMapViewTouchDelegate > mapViewCameraIdle(:)`
+    ///
+    /// - Parameter action: callBack
+    /// - Returns: Self
     func onMapTap(perform action: @escaping () -> Void) -> Self {
         var new = self
         new.onMapTap = action
         return new
     }
     
-//    public func onMapViewCameraIdle(action: @escaping (Double) -> Void) -> Self {
-//        var new = self
-//        new.onMapViewCameraIdle = action
-//        return new
-//    }
+    /// 마커가 탭 되면 호출 된다.
+    ///
+    /// - Parameter action: callBack
+    /// - Returns: Self
+    func onMarkerTap(perform action: @escaping () -> Void) -> Self {
+        var new = self
+        new.onMarkerTap = action
+        return new
+    }
 }
