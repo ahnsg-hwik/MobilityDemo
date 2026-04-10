@@ -60,8 +60,11 @@ public struct NaverMap: UIViewRepresentable {
         updateCamera(uiView.mapView, coordinator: context.coordinator)
         updateSelectedMarker(uiView.mapView, coordinator: context.coordinator)
         updateMarker(uiView.mapView, coordinator: context.coordinator)
-        updatePolygon(uiView.mapView, coordinator: context.coordinator)
-        updateExceptionPolygon(uiView.mapView, coordinator: context.coordinator)
+        if store.isUpdatingPolygon {
+            updatePolygon(uiView.mapView, coordinator: context.coordinator)
+            updateExceptionPolygon(uiView.mapView, coordinator: context.coordinator)
+            store.send(.onPolygonDrew)
+        }
     }
     
     public class Coordinator: NSObject,
@@ -102,9 +105,6 @@ public struct NaverMap: UIViewRepresentable {
             if self.parent.store.keyword.isMobility {
                 self.parent.store.send(.fetchFMSAPi)
             }
-            
-            // updateUIView 호출 시 연속 호출 동작 제한
-//            self.parent.store.send(.serviceAreaGroupResponse(nil))
         }
     }
 }

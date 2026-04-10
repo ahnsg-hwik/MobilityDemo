@@ -22,6 +22,7 @@ public struct NaverMapFeature {
         var selectedMarkerData: (any Markable)?
         
         var isUpdatingCameraPosition: Bool = false
+        var isUpdatingPolygon: Bool = false
         
         public init() {}
     }
@@ -36,6 +37,7 @@ public struct NaverMapFeature {
         // MARK:
         case onCurrentLocation
         case onCameraMoved
+        case onPolygonDrew
 
         // MARK: api
         case fetchServiceArea
@@ -102,6 +104,9 @@ public struct NaverMapFeature {
                 }
             case .onCameraMoved:
                 state.isUpdatingCameraPosition = false
+                return .none
+            case .onPolygonDrew:
+                state.isUpdatingPolygon = false
                 return .none
                 
                 // MARK: api
@@ -174,6 +179,7 @@ public struct NaverMapFeature {
                     await send(.poiResponse(response))
                 }
             case let .serviceAreaGroupResponse(areaGroup):
+                state.isUpdatingPolygon = true
                 state.serviceAreaGroup = areaGroup
                 return .none
             case let .fmsEquipmentsResponse(items):
