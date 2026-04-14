@@ -18,9 +18,7 @@ public struct MainView: View {
     
     @State private var isHidden = false
     private let visibleWidth: CGFloat = 20
-    private let totalWidth: CGFloat = 80
-    
-    @State private var offset: CGFloat = 0
+    private let totalWidth: CGFloat = 70
 
     public init(store: StoreOf<MainFeature>) {
         self.store = store
@@ -130,25 +128,35 @@ public struct MainView: View {
                     }
                 
                 VStack(spacing: 8) {
-                    Image(systemName: "p.square.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(.blue)
-                        .cornerRadius(8)
-                        .onTapGesture {
-                            store.send(.onPopupButtonTapped(true))
-                        }
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.blue)
+                            .frame(width: 40, height: 40)
+                            .cornerRadius(10)
+
+                        Text("P")
+                            .font(.system(size: 25, weight: .bold))
+                            .foregroundColor(.white)
+                            .font(.headline)
+                    }
+                    .onTapGesture {
+                        store.send(.onPopupButtonTapped(true))
+                    }
                     
-                    Image(systemName: "s.square.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(.red)
-                        .cornerRadius(8)
-                        .onTapGesture {
-                            store.send(.onSheetButtonTapped(true))
-                        }
+                    ZStack {
+                        Rectangle()
+                            .fill(Color.red)
+                            .frame(width: 40, height: 40)
+                            .cornerRadius(10)
+
+                        Text("S")
+                            .font(.system(size: 25, weight: .bold))
+                            .foregroundColor(.white)
+                            .font(.headline)
+                    }
+                    .onTapGesture {
+                        store.send(.onSheetButtonTapped(true))
+                    }
                 }
             }
             .frame(width: totalWidth)
