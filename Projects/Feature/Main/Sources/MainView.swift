@@ -31,7 +31,13 @@ public struct MainView: View {
                     dismissMarkerBottomSheet()
                 }
                 .onMarkerTap {
-                    store.send(.onMobilityTapped(true))
+                    switch store.keyword {
+                    case .kickboard, .bike:
+                        store.send(.onMobilityTapped(true))
+                    case .restaurant:
+                        store.send(.onPoiTapped(true))
+                    default: break
+                    }
                 }
                 .ignoresSafeArea()
             
@@ -84,6 +90,19 @@ public struct MainView: View {
                 .backgroundColor(.black.opacity(0.4))
                 .allowTapThroughBG(false)
                 .animation(.easeOut(duration: 0.1))
+        }
+        .popup(isPresented: $store.isPoiPresented) {
+            if let data = store.naverMap.selectedMarkerData as? PoiItem {
+                PoiBottomSheet(data: data) {
+                    store.send(.onPoiTapped(false))
+                }
+            }
+        } customize: {
+            $0
+                .type(.floater(verticalPadding: 0, useSafeAreaInset: false))
+                .position(.bottom)
+                .dragToDismiss(false)
+                .closeOnTap(false)
         }
         .popup(isPresented: $store.isPopupPresented) {
             BottomSheetFirst {
@@ -284,6 +303,7 @@ extension MainView {
     func dismissMarkerBottomSheet() {
         store.send(.naverMap(.onChangeSelectedMarkerData(nil)))
         store.send(.onMobilityTapped(false))
+        store.send(.onPoiTapped(false))
     }
 }
 

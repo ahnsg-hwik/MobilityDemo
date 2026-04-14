@@ -22,6 +22,7 @@ public struct MainFeature {
         var isSheetPresented = false
         var isMobilityPresented = false
         var isSpotPresented = false
+        var isPoiPresented = false
         
         // MARK: present
         var isMenuPresented = false
@@ -52,6 +53,7 @@ public struct MainFeature {
         case onSheetButtonTapped(Bool)
         case onMobilityTapped(Bool)
         case onSpotTapped(Bool)
+        case onPoiTapped(Bool)
         
         // MARK: present
         case onMenuButtonTapped(Bool)
@@ -98,6 +100,9 @@ public struct MainFeature {
                 return .none
             case let .onSpotTapped(isPresented):
                 state.isSpotPresented = isPresented
+                return .none
+            case let .onPoiTapped(isPresented):
+                state.isPoiPresented = isPresented
                 return .none
                 
                 // MARK: present

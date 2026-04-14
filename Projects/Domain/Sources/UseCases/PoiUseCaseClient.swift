@@ -33,8 +33,8 @@ private enum PoiUseCaseKeyClient: DependencyKey {
 
 extension PoiUseCaseKeyClient {
     static var pois = [
-        PoiItem(poiID: "1", poiName: "", lat: 37.552601, lon: 126.990989),
-        PoiItem(poiID: "2", poiName: "", lat: 37.545660, lon: 126.996311),
-        PoiItem(poiID: "3", poiName: "", lat: 37.544435, lon: 127.008327)
+        PoiItem(poiID: "1", poiName: "임자도", lat: 37.552601, lon: 126.990989, hwikCategoryCD: "음식점|생선회", briefDescription: "역곡시장에서 만나는 바다의 신선함"),
+        PoiItem(poiID: "2", poiName: "갈비도락 구로항동점", lat: 37.545660, lon: 126.996311, hwikCategoryCD: "음식점|육류"),
+        PoiItem(poiID: "3", poiName: "치히로 항동수목원점", lat: 37.544435, lon: 127.008327, hwikCategoryCD: "음식점|일식당", briefDescription: "아기자기한 분위기에서 즐기는 한 끼")
     ]
 }

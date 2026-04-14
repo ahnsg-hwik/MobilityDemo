@@ -246,6 +246,9 @@ extension NaverMap {
                     mapView.moveCamera(NMFCameraUpdate(scrollTo: marker.position , zoomTo: mapView.zoomLevel + 2))
                 case is Spot:
                     store.send(.fetchSpotDetail)
+                case is PoiItem:
+                    store.send(.onChangeSelectedMarkerData(item))
+                    self.onMarkerTap?()
                 default:
                     break
                 }
