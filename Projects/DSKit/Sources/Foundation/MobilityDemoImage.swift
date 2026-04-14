@@ -51,6 +51,8 @@ public enum MobilityDemoImage {
             switch name {
             case .bikeRiding:
                 return DSKitAsset.bikeRiding.image
+            case .MDSplash:
+                return DSKitAsset.mdSplash.image
             }
         }
     }
@@ -81,6 +83,8 @@ public enum MobilityDemoImage {
             switch name {
             case .bikeRiding:
                 return DSKitAsset.bikeRiding.swiftUIImage
+            case .MDSplash:
+                return DSKitAsset.mdSplash.swiftUIImage
             }
         }
     }
@@ -99,5 +103,6 @@ public extension MobilityDemoImage {
     
     enum MobilityDemoImage {
         case bikeRiding
+        case MDSplash
     }
 }
