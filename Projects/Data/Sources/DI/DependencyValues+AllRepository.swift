@@ -9,6 +9,7 @@ import ComposableArchitecture
 
 extension DependencyValues {
     public mutating func setAllRepository() {
+        self.spotRepositoryClient = .live
         self.picsumRepositoryClient = .live
     }
 }

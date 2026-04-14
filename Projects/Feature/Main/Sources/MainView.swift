@@ -31,7 +31,7 @@ public struct MainView: View {
                     dismissMarkerBottomSheet()
                 }
                 .onMarkerTap {
-                    store.send(.onMarkerTapped(true))
+                    store.send(.onMobilityTapped(true))
                 }
                 .ignoresSafeArea()
             
@@ -58,10 +58,10 @@ public struct MainView: View {
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) {
             PhotoView(store: $0)
         }
-        .popup(isPresented: $store.isMarkerPresented) {
+        .popup(isPresented: $store.isMobilityPresented) {
             if let data = store.naverMap.selectedMarkerData as? Mobility {
                 MobilityBottomSheet(data: data) {
-                    store.send(.onMarkerTapped(false))
+                    store.send(.onMobilityTapped(false))
                 }
             }
         } customize: {
@@ -70,6 +70,20 @@ public struct MainView: View {
                 .position(.bottom)
                 .dragToDismiss(false)
                 .closeOnTap(false)
+        }
+        .popup(isPresented: $store.isSpotPresented) {
+            if let data = store.spotDetail {
+                SpotDetailPopup(data: data) {
+                    store.send(.onSpotTapped(false))
+                }
+            }
+        } customize: {
+            $0
+                .appearFrom(.centerScale)
+                .closeOnTap(false)
+                .backgroundColor(.black.opacity(0.4))
+                .allowTapThroughBG(false)
+                .animation(.easeOut(duration: 0.1))
         }
         .popup(isPresented: $store.isPopupPresented) {
             BottomSheetFirst {
@@ -269,7 +283,7 @@ public struct MainView: View {
 extension MainView {
     func dismissMarkerBottomSheet() {
         store.send(.naverMap(.onChangeSelectedMarkerData(nil)))
-        store.send(.onMarkerTapped(false))
+        store.send(.onMobilityTapped(false))
     }
 }
 

@@ -45,6 +45,7 @@ public struct NaverMapFeature {
         case fetchFMSEquipments
         case fetchFMSClustering
         case fetchSpot
+        case fetchSpotDetail
         case fetchPoi
         
         case serviceAreaGroupResponse(ServiceAreaGroup?)
@@ -52,6 +53,7 @@ public struct NaverMapFeature {
         case fmsClusteringLevel1Response([LocationModel])
         case fmsClusteringLevel2Response([LocationModel])
         case spotResponse([Spot])
+        case spotDetailResponse(SpotDetail)
         case poiResponse([PoiItem])
     }
     
@@ -173,6 +175,11 @@ public struct NaverMapFeature {
                     let response = try await spotUseCaseClient.fetchSpots()
                     await send(.spotResponse(response))
                 }
+            case .fetchSpotDetail:
+                return .run { send in
+                    let response = try await spotUseCaseClient.fetchSpotDetail()
+                    await send(.spotDetailResponse(response))
+                }
             case .fetchPoi:
                 return .run { send in
                     let response = try await poiUseCaseClient.fetchPois()
@@ -193,6 +200,8 @@ public struct NaverMapFeature {
                 return .none
             case let .spotResponse(items):
                 state.markerData.spot = items
+                return .none
+            case .spotDetailResponse: // To Parent
                 return .none
             case let .poiResponse(items):
                 state.markerData.poi = items

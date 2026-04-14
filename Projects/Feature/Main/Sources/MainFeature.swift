@@ -15,11 +15,13 @@ public struct MainFeature {
     public struct State {
         // MARK: map
         var keyword: BubbleKeywordKind = .kickboard
+        var spotDetail: SpotDetail?
 
         // MARK: popup
         var isPopupPresented = false
         var isSheetPresented = false
-        var isMarkerPresented = false
+        var isMobilityPresented = false
+        var isSpotPresented = false
         
         // MARK: present
         var isMenuPresented = false
@@ -48,7 +50,8 @@ public struct MainFeature {
         // MARK: popup
         case onPopupButtonTapped(Bool)
         case onSheetButtonTapped(Bool)
-        case onMarkerTapped(Bool)
+        case onMobilityTapped(Bool)
+        case onSpotTapped(Bool)
         
         // MARK: present
         case onMenuButtonTapped(Bool)
@@ -90,8 +93,11 @@ public struct MainFeature {
             case let .onSheetButtonTapped(isPresented):
                 state.isSheetPresented = isPresented
                 return .none
-            case let .onMarkerTapped(isPresented):
-                state.isMarkerPresented = isPresented
+            case let .onMobilityTapped(isPresented):
+                state.isMobilityPresented = isPresented
+                return .none
+            case let .onSpotTapped(isPresented):
+                state.isSpotPresented = isPresented
                 return .none
                 
                 // MARK: present
@@ -115,7 +121,10 @@ public struct MainFeature {
                 case let .onChangeKeyword(keyword):
                     state.keyword = keyword
                     return .none
-                default: return.none
+                case let .spotDetailResponse(item):
+                    state.spotDetail = item
+                    return .send(.onSpotTapped(true))
+                default: return .none
                 }
                 
                 // MARK: 하단 필수

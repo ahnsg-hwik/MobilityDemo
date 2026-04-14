@@ -237,11 +237,17 @@ extension NaverMap {
                 return selected ? item.selectedImage : item.image
             }
             .zIndex(selected ? 100 : 0)
-            .onTap {
-                let isNotSelectable = selected || item is LocationModel
-                if !isNotSelectable {
+            .onTap { marker, mapView in
+                switch item {
+                case is Mobility: // 모빌리티
                     store.send(.onChangeSelectedMarkerData(item))
                     self.onMarkerTap?()
+                case is LocationModel: // 클러스터링
+                    mapView.moveCamera(NMFCameraUpdate(scrollTo: marker.position , zoomTo: mapView.zoomLevel + 2))
+                case is Spot:
+                    store.send(.fetchSpotDetail)
+                default:
+                    break
                 }
             }
     }

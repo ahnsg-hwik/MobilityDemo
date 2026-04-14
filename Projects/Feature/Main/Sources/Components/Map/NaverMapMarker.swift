@@ -16,7 +16,7 @@ public struct NaverMapMarker {
     var captionText: String?
     var zIndex: Int = 0
     var anchor: CGPoint = .init(x: 0.5, y: 1)
-    var onTap: (() -> Void)?
+    var onTap: ((NMFMarker, NMFMapView) -> Void)?
     
     public init(position: CLLocationCoordinate2D) {
         self.position = position
@@ -37,7 +37,7 @@ public struct NaverMapMarker {
                 }
                 marker.captionText = captionText ?? ""
                 marker.touchHandler = { _ in
-                    self.onTap?()
+                    self.onTap?(marker, mapView)
                     return true
                 }
                 
@@ -66,7 +66,7 @@ extension NaverMapMarker {
         return new
     }
     
-    public func onTap(perform action: @escaping () -> Void) -> Self {
+    public func onTap(_ action: @escaping (NMFMarker, NMFMapView) -> Void) -> Self {
         var new = self
         new.onTap = action
         return new
