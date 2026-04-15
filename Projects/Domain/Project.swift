@@ -6,6 +6,7 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let project = Project(
     name: "Domain",
@@ -16,7 +17,7 @@ let project = Project(
             product: .framework,
 //            product: .staticFramework,
             bundleId: "dev.tuist.MobilityDemo.Domain",
-            deploymentTargets: .iOS("17.0"),
+            deploymentTargets: .appMinimunTarget,
             buildableFolders: [
                 "Sources",
             ],

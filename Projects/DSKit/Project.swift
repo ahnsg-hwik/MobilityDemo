@@ -6,6 +6,7 @@
 //
 
 import ProjectDescription
+import ProjectDescriptionHelpers
 
 let project = Project(
     name: "DSKit",
@@ -20,7 +21,7 @@ let project = Project(
             product: .framework,
 //            product: .staticFramework,
             bundleId: "dev.tuist.MobilityDemo.DSKit",
-            deploymentTargets: .iOS("17.0"),
+            deploymentTargets: .appMinimunTarget,
             buildableFolders: [
                 "Sources",
                 "Resources",
