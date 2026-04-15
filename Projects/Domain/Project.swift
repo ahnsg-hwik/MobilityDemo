@@ -14,8 +14,7 @@ let project = Project(
         .target(
             name: "Domain",
             destinations: .iOS,
-            product: .framework,
-//            product: .staticFramework,
+            product: TuistRelease.isRelease ? .staticFramework : .framework,
             bundleId: "dev.tuist.MobilityDemo.Domain",
             deploymentTargets: .appMinimunTarget,
             buildableFolders: [

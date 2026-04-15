@@ -16,8 +16,7 @@ public enum Feature: String, CaseIterable {
         return .target(
             name: "\(self.rawValue)",
             destinations: .iOS,
-            product: .framework,
-//            product: .staticFramework,
+            product: TuistRelease.isRelease ? .staticFramework : .framework,
             bundleId: "dev.tuist.MobilityDemo.\(self.rawValue)",
             deploymentTargets: .appMinimunTarget,
             infoPlist: .file(path: .relativeToRoot("Projects/App/Resources/MobilityDemo-Info.plist")),

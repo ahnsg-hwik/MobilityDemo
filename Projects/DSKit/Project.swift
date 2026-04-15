@@ -18,8 +18,7 @@ let project = Project(
         .target(
             name: "DSKit",
             destinations: .iOS,
-            product: .framework,
-//            product: .staticFramework,
+            product: TuistRelease.isRelease ? .staticFramework : .framework,
             bundleId: "dev.tuist.MobilityDemo.DSKit",
             deploymentTargets: .appMinimunTarget,
             buildableFolders: [
